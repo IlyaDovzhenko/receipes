@@ -1,10 +1,10 @@
-package com.spring.receipes;
+package com.spring.recipes;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class ReceipesApplicationTests {
+class RecipesApplicationTests {
 
     @Test
     void contextLoads() {

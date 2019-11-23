@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.spring</groupId>
-    <artifactId>receipes</artifactId>
+    <artifactId>recipes</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>receipes</name>
-    <description>Receipe project for Spring Boot</description>
+    <name>recipes</name>
+    <description>Recipe project for Spring Boot</description>
 
     <properties>
         <java.version>1.8</java.version>
