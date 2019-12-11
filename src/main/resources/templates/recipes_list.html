@@ -9,11 +9,11 @@
     <table>
         <thead>
             <tr>
-                <th>1</th>
-                <th>2</th>
-                <th>3</th>
-                <th>4</th>
-                <th>5</th>
+                <th>Id</th>
+                <th>Description</th>
+                <th>Difficulty</th>
+                <th>Cook time</th>
+                <th>Notes</th>
             </tr>
         </thead>
         <tbody>
@@ -23,9 +23,7 @@
                 <td th:text="${recipe.getDifficulty()}"></td>
                 <td th:text="${recipe.getCookTime()}"></td>
                 <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
-
             </tr>
-
         </tbody>
     </table>
 </body>
