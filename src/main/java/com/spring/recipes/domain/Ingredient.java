@@ -1,16 +1,13 @@
 package com.spring.recipes.domain;
 
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
 
-@Getter
-@Setter
-@Entity
+@Data
 @NoArgsConstructor
+@Entity
 public class Ingredient {
 
     @Id

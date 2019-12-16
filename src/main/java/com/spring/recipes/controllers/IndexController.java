@@ -6,12 +6,14 @@ import com.spring.recipes.repositories.CategoryRepository;
 import com.spring.recipes.repositories.RecipeRepository;
 import com.spring.recipes.repositories.UnitOfMeasureRepository;
 import com.spring.recipes.services.RecipeService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.Optional;
 
+@Slf4j
 @Controller
 public class IndexController {
 
@@ -25,6 +27,7 @@ public class IndexController {
         this.categoryRepository = categoryRepository;
         this.unitOfMeasureRepository = unitOfMeasureRepository;
         this.recipeService = recipeService;
+        log.debug("Dependencies are injected!");
     }
 
     @GetMapping({"", "/", "/index", "/index.html"})

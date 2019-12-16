@@ -1,5 +1,7 @@
 package com.spring.recipes.domain;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,8 +9,8 @@ import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
+@EqualsAndHashCode(exclude = {"ingredients","categories","notes"})
 @Entity
 public class Recipe {
     @Id
@@ -41,10 +43,9 @@ public class Recipe {
     )
     private Set<Category> categories = new HashSet<>();
 
-    public Recipe addIngredient(Ingredient ingredient) {
+    public void addIngredient(Ingredient ingredient) {
         ingredient.setRecipe(this);
         this.ingredients.add(ingredient);
-        return this;
     }
 
     public void setNotes(Notes notes) {
