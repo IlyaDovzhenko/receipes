@@ -5,7 +5,6 @@ import com.spring.recipes.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import java.util.HashSet;
 import java.util.Set;
@@ -32,7 +31,6 @@ class RecipeServiceImplTest {
         HashSet<Recipe> recipesData = new HashSet<>();
         recipesData.add(recipe);
         when(recipeRepository.findAll()).thenReturn(recipesData);
-        //recipeService.getRecipes().forEach(System.out::println);
 
         Set<Recipe> recipes = recipeService.getRecipes();
         assertEquals(recipes.size(), 1);

@@ -3,7 +3,6 @@ package com.spring.recipes.controllers;
 import com.spring.recipes.domain.Category;
 import com.spring.recipes.domain.UnitOfMeasure;
 import com.spring.recipes.repositories.CategoryRepository;
-import com.spring.recipes.repositories.RecipeRepository;
 import com.spring.recipes.repositories.UnitOfMeasureRepository;
 import com.spring.recipes.services.RecipeService;
 import lombok.extern.slf4j.Slf4j;
@@ -47,7 +46,7 @@ public class IndexController {
     }
 
     @GetMapping("/recipes")
-    public String getRecipe(Model model) {
+    public String getRecipes(Model model) {
         model.addAttribute("recipes", recipeService.getRecipes());
         return "recipes_list";
     }
