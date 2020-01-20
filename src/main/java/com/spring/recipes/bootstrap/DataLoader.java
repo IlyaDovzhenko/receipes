@@ -65,7 +65,7 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         guacamoleRecipe.setPrepTime(20);
         guacamoleRecipe.setCookTime(60);
         guacamoleRecipe.setServings(24);
-        guacamoleRecipe.setUrl("uuuuurl");
+        guacamoleRecipe.setUrl("guacamole_url");
         guacamoleRecipe.setDirections("Cook!");
         guacamoleRecipe.setNotes(notes);
 
@@ -79,6 +79,28 @@ public class DataLoader implements ApplicationListener<ContextRefreshedEvent> {
         guacamoleRecipe.addIngredient(new Ingredient("ripe tomato, seeds and pulp removed, chopped", new BigDecimal(0.5), thingUom));
 
         recipes.add(guacamoleRecipe);
+
+        Recipe pizzaRecipe = new Recipe();
+        pizzaRecipe.setDescription("Good Pizza");
+
+        Notes pizzaNotes = new Notes();
+        pizzaNotes.setRecipeNotes("Good italian pizza");
+
+        pizzaRecipe.getCategories().add(italianCategory);
+        pizzaRecipe.setDifficulty(Difficulty.MODERATE);
+        pizzaRecipe.setPrepTime(35);
+        pizzaRecipe.setCookTime(25);
+        pizzaRecipe.setServings(10);
+        pizzaRecipe.setUrl("pizza_url");
+        pizzaRecipe.setDirections("Cook pizza! Eat pizza!");
+        pizzaRecipe.setNotes(pizzaNotes);
+
+        pizzaRecipe.addIngredient(new Ingredient("ingredient_1", new BigDecimal(1), thingUom));
+        pizzaRecipe.addIngredient(new Ingredient("ingredient_2", new BigDecimal(0.5), teaspoonUom));
+        pizzaRecipe.addIngredient(new Ingredient("ingredient_3", new BigDecimal(1), tablespoonUom));
+        pizzaRecipe.addIngredient(new Ingredient("ingredient_4", new BigDecimal(1), tablespoonUom));
+
+        recipes.add(pizzaRecipe);
 
         System.out.println("Creating data...");
         return recipes;
