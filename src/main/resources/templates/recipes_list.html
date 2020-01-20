@@ -5,24 +5,39 @@
     <title>Recipes</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
           integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
-          crossorigin="anonymous">
+          crossorigin="anonymous"
+          th:href="@{/webjars/bootstrap/4.4.1/css/bootstrap.min.css}">
     <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js"
             integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n"
             crossorigin="anonymous"></script>
+    <script src="/webjars/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js"
             integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo"
             crossorigin="anonymous"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
             integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            crossorigin="anonymous"></script>
+            crossorigin="anonymous"
+            th:src="@{/webjars/bootstrap/4.4.1/js/bootstrap.min.js}"></script>
 </head>
 <body>
     <div class="container" style="margin-top: 20px">
         <div class="row">
             <div class="col-md-6 col-md-offset-3">
+
+
+                <div class="card">
+                    <div class="card-header">
+                        Title
+                    </div>
+                    <div class="card-body">
+                        This is some text within a card body.
+                    </div>
+                </div>
+
+
                 <div class="panel panel-primary">
-                    <div class="panel-header">
-                        <h1 class="header-panel">All Recipes!</h1>
+                    <div class="header-panel">
+                        <h1 class="title">All Recipes!</h1>
                     </div>
                     <div class="panel-body">
                         <div class="table-responsive" th:if="${not #lists.isEmpty(recipes)}">
@@ -56,6 +71,7 @@
                                         <td th:text="${recipe.getDifficulty()}"></td>
                                         <td th:text="${recipe.getCookTime()}"></td>
                                         <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
+                                        <td><a href="#" th:href="@{'/recipes/show/' + ${recipe.getId()}}">View</a></td>
                                     </tr>
                                 </tbody>
                             </table>

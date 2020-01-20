@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.Optional;
 
@@ -51,4 +53,10 @@ public class IndexController {
         return "recipes_list";
     }
 
+    @RequestMapping("/recipes/show/{id}")
+    public String showById(@PathVariable Long id, Model model) {
+        model.addAttribute("recipe", recipeService.findById(id));
+        //model.addAttribute("categories", recipeService.findById(id).getCategories());
+        return "/recipes/show";
+    }
 }
