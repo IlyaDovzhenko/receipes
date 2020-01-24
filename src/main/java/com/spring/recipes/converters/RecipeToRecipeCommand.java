@@ -52,7 +52,6 @@ public class RecipeToRecipeCommand implements Converter<Recipe, RecipeCommand> {
             recipe.getCategories()
                     .forEach(category -> recipeCommand.getCategories().add(categoryConverter.convert(category)));
         }
-
         return recipeCommand;
     }
 }
