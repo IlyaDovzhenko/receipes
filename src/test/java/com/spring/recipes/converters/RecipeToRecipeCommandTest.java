@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-class RecipeCommandToRecipeTest {
+class RecipeToRecipeCommandTest {
 
     private static final Long RECIPE_ID = 1L;
     private static final String RECIPE_DESCRIPTION = "recipe_description";
@@ -43,16 +43,16 @@ class RecipeCommandToRecipeTest {
     private static final String CATEGORY_DESCRIPTION = "category_description";
 
     @Mock
-    private IngredientCommandToIngredient ingredientConverter;
+    private IngredientToIngredientCommand ingredientConverter;
 
     @Mock
-    private NotesCommandToNotes notesConverter;
+    private NotesToNotesCommand notesConverter;
 
     @Mock
-    private CategoryCommandToCategory categoryConverter;
+    private CategoryToCategoryCommand categoryConverter;
 
     @InjectMocks
-    private RecipeCommandToRecipe recipeCommandConverter;
+    private RecipeToRecipeCommand recipeConverter;
 
     @BeforeEach
     void setUp() {
@@ -83,56 +83,56 @@ class RecipeCommandToRecipeTest {
 
     @Test
     void testNullObject() {
-        assertNull(recipeCommandConverter.convert(null));
+        assertNull(recipeConverter.convert(null));
     }
 
     @Test
     void testEmptyObject() {
-        assertNotNull(recipeCommandConverter.convert(new RecipeCommand()));
+        assertNotNull(recipeConverter.convert(new Recipe()));
     }
 
     @Test
     void convert() {
         //given
-        when(ingredientConverter.convert(ingredientCommand)).thenReturn(ingredient);
-        when(notesConverter.convert(notesCommand)).thenReturn(notes);
-        when(categoryConverter.convert(categoryCommand)).thenReturn(category);
+        when(ingredientConverter.convert(ingredient)).thenReturn(ingredientCommand);
+        when(notesConverter.convert(notes)).thenReturn(notesCommand);
+        when(categoryConverter.convert(category)).thenReturn(categoryCommand);
 
-        RecipeCommand recipeCommand = new RecipeCommand();
-        recipeCommand.setId(RECIPE_ID);
-        recipeCommand.setDescription(RECIPE_DESCRIPTION);
-        recipeCommand.setPrepTime(RECIPE_PREP_TIME);
-        recipeCommand.setCookTime(RECIPE_COOK_TIME);
-        recipeCommand.setServings(RECIPE_SERVINGS);
-        recipeCommand.setUrl(RECIPE_URL);
-        recipeCommand.setDirections(RECIPE_DIRECTIONS);
-        recipeCommand.setDifficulty(RECIPE_DIFFICULTY);
-        recipeCommand.getIngredients().add(ingredientCommand);
-        recipeCommand.setImage(null);
-        recipeCommand.setNotes(notesCommand);
-        recipeCommand.getCategories().add(categoryCommand);
+        Recipe recipe = new Recipe();
+        recipe.setId(RECIPE_ID);
+        recipe.setDescription(RECIPE_DESCRIPTION);
+        recipe.setPrepTime(RECIPE_PREP_TIME);
+        recipe.setCookTime(RECIPE_COOK_TIME);
+        recipe.setServings(RECIPE_SERVINGS);
+        recipe.setUrl(RECIPE_URL);
+        recipe.setDirections(RECIPE_DIRECTIONS);
+        recipe.setDifficulty(RECIPE_DIFFICULTY);
+        recipe.getIngredients().add(ingredient);
+        recipe.setImage(null);
+        recipe.setNotes(notes);
+        recipe.getCategories().add(category);
 
         //when
-        Recipe recipe = recipeCommandConverter.convert(recipeCommand);
+        RecipeCommand recipeCommand = recipeConverter.convert(recipe);
 
         //then
-        assertNotNull(recipe);
-        assertEquals(RECIPE_ID, recipe.getId());
-        assertEquals(RECIPE_DESCRIPTION, recipe.getDescription());
-        assertEquals(RECIPE_PREP_TIME, recipe.getPrepTime());
-        assertEquals(RECIPE_COOK_TIME, recipe.getCookTime());
-        assertEquals(RECIPE_SERVINGS, recipe.getServings());
-        assertEquals(RECIPE_URL, recipe.getUrl());
-        assertEquals(RECIPE_DIRECTIONS, recipe.getDirections());
-        assertEquals(RECIPE_DIFFICULTY, recipe.getDifficulty());
-        assertEquals(1, recipe.getIngredients().size());
-        assertNull(recipe.getImage());
-        assertEquals(NOTES_ID, recipe.getNotes().getId());
-        assertEquals(NOTES, recipe.getNotes().getRecipeNotes());
-        assertEquals(1, recipe.getCategories().size());
+        assertNotNull(recipeCommand);
+        assertEquals(RECIPE_ID, recipeCommand.getId());
+        assertEquals(RECIPE_DESCRIPTION, recipeCommand.getDescription());
+        assertEquals(RECIPE_PREP_TIME, recipeCommand.getPrepTime());
+        assertEquals(RECIPE_COOK_TIME, recipeCommand.getCookTime());
+        assertEquals(RECIPE_SERVINGS, recipeCommand.getServings());
+        assertEquals(RECIPE_URL, recipeCommand.getUrl());
+        assertEquals(RECIPE_DIRECTIONS, recipeCommand.getDirections());
+        assertEquals(RECIPE_DIFFICULTY, recipeCommand.getDifficulty());
+        assertEquals(1, recipeCommand.getIngredients().size());
+        assertNull(recipeCommand.getImage());
+        assertEquals(NOTES_ID, recipeCommand.getNotes().getId());
+        assertEquals(NOTES, recipeCommand.getNotes().getRecipeNotes());
+        assertEquals(1, recipeCommand.getCategories().size());
 
-        verify(ingredientConverter, times(1)).convert(ingredientCommand);
-        verify(notesConverter, times(1)).convert(notesCommand);
-        verify(categoryConverter, times(1)).convert(categoryCommand);
+        verify(ingredientConverter, times(1)).convert(ingredient);
+        verify(notesConverter, times(1)).convert(notes);
+        verify(categoryConverter, times(1)).convert(category);
     }
 }
