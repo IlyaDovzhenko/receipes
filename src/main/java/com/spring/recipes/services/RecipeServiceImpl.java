@@ -1,19 +1,31 @@
 package com.spring.recipes.services;
 
+import com.spring.recipes.command.RecipeCommand;
+import com.spring.recipes.converters.RecipeCommandToRecipe;
+import com.spring.recipes.converters.RecipeToRecipeCommand;
 import com.spring.recipes.domain.Recipe;
 import com.spring.recipes.repositories.RecipeRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+@Slf4j
 @Service
 public class RecipeServiceImpl implements RecipeService {
-    private final RecipeRepository recipeRepository;
 
-    public RecipeServiceImpl(RecipeRepository recipeRepository) {
+    private final RecipeRepository recipeRepository;
+    private final RecipeCommandToRecipe recipeCommandToRecipe;
+    private final RecipeToRecipeCommand recipeToRecipeCommand;
+
+    public RecipeServiceImpl(RecipeRepository recipeRepository,
+                             RecipeCommandToRecipe recipeCommandToRecipe,
+                             RecipeToRecipeCommand recipeToRecipeCommand) {
         this.recipeRepository = recipeRepository;
+        this.recipeCommandToRecipe = recipeCommandToRecipe;
+        this.recipeToRecipeCommand = recipeToRecipeCommand;
     }
 
     @Override
@@ -29,5 +41,18 @@ public class RecipeServiceImpl implements RecipeService {
         if (!optionalRecipe.isPresent())
             throw new RuntimeException("Recipe Not Found!");
         return optionalRecipe.orElse(null);
+    }
+
+    @Override
+    public RecipeCommand saveRecipeCommand(RecipeCommand recipeCommand) {
+        Recipe recipeToSave = recipeCommandToRecipe.convert(recipeCommand);
+
+        if (recipeToSave != null) {
+            recipeRepository.save(recipeToSave);
+            log.debug("Saved recipe id: " + recipeToSave.getId());
+            return recipeToRecipeCommand.convert(recipeToSave);
+        } else {
+            throw new RuntimeException("Problem with convert recipe!");
+        }
     }
 }

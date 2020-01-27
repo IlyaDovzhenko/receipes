@@ -1,5 +1,8 @@
 package com.spring.recipes.services;
 
+import com.spring.recipes.command.RecipeCommand;
+import com.spring.recipes.converters.RecipeCommandToRecipe;
+import com.spring.recipes.converters.RecipeToRecipeCommand;
 import com.spring.recipes.domain.Recipe;
 import com.spring.recipes.repositories.RecipeRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -22,18 +25,32 @@ class RecipeServiceImplTest {
     @Mock
     private RecipeRepository recipeRepository;
 
+    @Mock
+    private RecipeCommandToRecipe recipeCommandToRecipe;
+
+    @Mock
+    private RecipeToRecipeCommand recipeToRecipeCommand;
+
     @InjectMocks
     private RecipeServiceImpl recipeService;
 
     private Recipe returnedRecipe;
-    private static final Long RECIPE_ID = 1L;
+    private RecipeCommand recipeCommand;
+    private static final Long RECIPE_ID = 3L;
     private static final String RECIPE_DESCRIPTION = "recipe_description";
+
+    private static final String SAVE_EXCEPTION_MESSAGE = "Problem with convert recipe!";
+    private static final String FIND_BY_ID_EXCEPTION_MESSAGE = "Recipe Not Found!";
 
     @BeforeEach
     void setUp() {
         returnedRecipe = new Recipe();
         returnedRecipe.setId(RECIPE_ID);
         returnedRecipe.setDescription(RECIPE_DESCRIPTION);
+
+        recipeCommand = new RecipeCommand();
+        recipeCommand.setId(RECIPE_ID);
+        recipeCommand.setDescription(RECIPE_DESCRIPTION);
     }
 
     @Test
@@ -57,6 +74,38 @@ class RecipeServiceImplTest {
         assertEquals(RECIPE_ID, recipe.getId());
         assertEquals(RECIPE_DESCRIPTION, recipe.getDescription());
         verify(recipeRepository, times(1)).findById(RECIPE_ID);
+    }
 
+    @Test
+    void findByIdExceptionTest() {
+        when(recipeRepository.findById(RECIPE_ID)).thenReturn(Optional.empty());
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> recipeService.findById(RECIPE_ID));
+
+        assertEquals(FIND_BY_ID_EXCEPTION_MESSAGE, exception.getMessage());
+        verify(recipeRepository, times(1)).findById(RECIPE_ID);
+    }
+
+    @Test
+    void testSaveRecipeCommand() {
+        when(recipeCommandToRecipe.convert(any())).thenReturn(returnedRecipe);
+        when(recipeToRecipeCommand.convert(any())).thenReturn(recipeCommand);
+
+        RecipeCommand recipeCommandToSave = recipeService.saveRecipeCommand(recipeCommand);
+        assertNotNull(recipeCommandToSave);
+        assertEquals(RECIPE_ID, recipeCommandToSave.getId());
+        assertEquals(RECIPE_DESCRIPTION, recipeCommandToSave.getDescription());
+        verify(recipeRepository, times(1)).save(any());
+    }
+
+    @Test
+    void saveExceptionTest() {
+        when(recipeCommandToRecipe.convert(any())).thenReturn(null);
+
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> recipeService.saveRecipeCommand(recipeCommand));
+        assertEquals(SAVE_EXCEPTION_MESSAGE, exception.getMessage());
     }
 }
