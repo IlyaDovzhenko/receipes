@@ -48,7 +48,7 @@
                                         <td th:text="${recipe.getDifficulty()}"></td>
                                         <td th:text="${recipe.getCookTime()}"></td>
                                         <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
-                                        <td><a href="#" th:href="@{'/recipes/show/' + ${recipe.getId()}}">View</a></td>
+                                        <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()}}">View</a></td>
                                     </tr>
                                 </tbody>
                             </table>

@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8"/>
-    <title>Edit Recipe</title>
+    <title>Recipe Form</title>
 
     <!-- Latest compiled and minified CSS -->
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
@@ -23,16 +23,19 @@
 <div class="container-fluid" style="margin-top: 20px">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <form th:object="${recipe}" th:action="@{recipe}" method="post">
+            <form th:object="${recipe}" th:action="@{/recipes}" method="post">
                 <input type="hidden" th:field="*{id}" />
                 <div class="card mb-3">
+                    <div class="card-header">Edit Recipe</div>
 
-                    <div class="card-header">
-                        <label>Recipe description:</label>
-                        <input type="text" class="form-control" th:field="*{description}" />
-                    </div>
                     <div class="card-body">
                         <div class="row">
+                            <div class="col-md-3" >
+                                <label>Recipe description:</label>
+                                <input type="text" class="form-control" th:field="*{description}" />
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top: 20px">
                             <div class="col-md-3">
                                 <label>Categories:</label>
                             </div>
