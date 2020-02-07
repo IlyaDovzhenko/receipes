@@ -1,7 +1,6 @@
 package com.spring.recipes.services;
 
 import com.spring.recipes.command.RecipeCommand;
-import com.spring.recipes.converters.RecipeCommandToRecipe;
 import com.spring.recipes.converters.RecipeToRecipeCommand;
 import com.spring.recipes.domain.Recipe;
 import com.spring.recipes.repositories.RecipeRepository;

@@ -19,12 +19,11 @@
             th:src="@{/webjars/bootstrap/4.4.1/js/bootstrap.min.js}"></script>
 </head>
 <body>
+<!--/*@thymesVar id="recipe" type="com.spring.recipes.domain.Recipe"*/-->
 <div class="container-fluid" style="margin-top: 20px">
-    <!--/*@thymesVar id="recipe" type="com.spring.recipes.domain.Recipe"*/-->
     <div class="row">
         <div class="col-md-6 offset-md-3">
             <div class="card mb-3">
-
                 <div class="card-header" th:text="${recipe.description}">Recipe Description</div>
                 <div class="card-body">
                     <div class="row">
