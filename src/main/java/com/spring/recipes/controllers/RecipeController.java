@@ -23,23 +23,27 @@ public class RecipeController {
         return "recipes_list";
     }
 
-    @RequestMapping("/recipes/{id}")
+    @GetMapping("/recipes/{id}/show")
     public String showById(@PathVariable Long id, Model model) {
         model.addAttribute("recipe", recipeService.findById(id));
         return "/recipes/show";
     }
 
-    @RequestMapping("/recipes/new")
+    @GetMapping("/recipes/{id}/update")
+    public String updateById(@PathVariable Long id, Model model) {
+        model.addAttribute("recipe", recipeService.findCommandById(id));
+        return "/recipes/recipe_form";
+    }
+
+    @GetMapping("/recipes/new")
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
         return "/recipes/recipe_form";
     }
 
     @PostMapping("recipes")
-    //@RequestMapping("recipes")
     public String saveOrUpdate(@ModelAttribute RecipeCommand recipeCommand) {
         RecipeCommand savedRecipeCommand = recipeService.saveRecipeCommand(recipeCommand);
-        return "redirect:/recipes/" + savedRecipeCommand.getId();
+        return "redirect:/recipes/" + savedRecipeCommand.getId() + "/show";
     }
-
 }

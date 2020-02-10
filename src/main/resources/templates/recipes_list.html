@@ -23,7 +23,6 @@
     <div class="container" style="margin-top: 20px">
         <div class="row">
             <div class="col-md-12 col-md-offset-3">
-
                 <div class="card mb-3">
                     <div class="card-header">
                         <h2>Recipes table</h2>
@@ -48,15 +47,13 @@
                                         <td th:text="${recipe.getDifficulty()}"></td>
                                         <td th:text="${recipe.getCookTime()}"></td>
                                         <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
-                                        <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()}}">View</a></td>
+                                        <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/show'}">View</a></td>
                                     </tr>
                                 </tbody>
                             </table>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

@@ -1,5 +1,6 @@
 package com.spring.recipes.controllers;
 
+import com.spring.recipes.command.RecipeCommand;
 import com.spring.recipes.domain.Recipe;
 import com.spring.recipes.services.RecipeService;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,9 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
@@ -21,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,12 +39,15 @@ class RecipeControllerTest {
     @Mock
     private Model model;
 
+    private MockMvc mockMvc;
+
     @BeforeEach
     void setUp() {
+        mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
     }
 
     @Test
-    void getRecipes() {
+    void testGetRecipes() {
         //given
         Set<Recipe> recipes = new HashSet<>();
         Recipe recipe1 = new Recipe();
@@ -66,29 +73,59 @@ class RecipeControllerTest {
     }
 
     @Test
-    void testMockMvc() throws Exception {
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
+    void testGetRecipesView() throws Exception {
         mockMvc.perform(get("/recipes"))
                 .andExpect(status().isOk())
                 .andExpect(MockMvcResultMatchers.view().name("recipes_list"));
     }
 
     @Test
-    void getRecipe() throws Exception {
+    void testShowRecipeById() throws Exception {
         Recipe recipe = new Recipe();
         recipe.setId(1L);
 
-        MockMvc mockMvc = MockMvcBuilders.standaloneSetup(recipeController).build();
-
         when(recipeService.findById(anyLong())).thenReturn(recipe);
 
-        mockMvc.perform(get("/recipes/show/1"))
+        mockMvc.perform(get("/recipes/1/show"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("/recipes/show"))
                 .andExpect(model().attributeExists("recipe"));
     }
 
     @Test
-    void showById() {
+    void testGetNewRecipeForm() throws Exception {
+        mockMvc.perform(get("/recipes/new"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("/recipes/recipe_form"))
+                .andExpect(model().attributeExists("recipe"));
+    }
+
+    @Test
+    void testPostNewRecipeForm() throws Exception {
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(1L);
+
+        when(recipeService.saveRecipeCommand(any())).thenReturn(recipeCommand);
+
+        RequestBuilder postRequestBuilder = post("/recipes")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED)
+                .param("id", "")
+                .param("description", "some string");
+        mockMvc.perform(postRequestBuilder)
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipes/1/show"));
+    }
+
+    @Test
+    void testGetUpdateRecipeForm() throws Exception {
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(1L);
+
+        when(recipeService.findCommandById(1L)).thenReturn(recipeCommand);
+
+        mockMvc.perform(get("/recipes/1/update"))
+                .andExpect(status().isOk())
+                .andExpect(MockMvcResultMatchers.view().name("/recipes/recipe_form"))
+                .andExpect(model().attributeExists("recipe"));
     }
 }
