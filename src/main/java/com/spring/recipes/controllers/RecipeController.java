@@ -14,6 +14,7 @@ public class RecipeController {
     private RecipeService recipeService;
 
     public RecipeController(RecipeService recipeService) {
+        log.debug(RecipeController.class.getName() + " run!");
         this.recipeService = recipeService;
     }
 
@@ -39,6 +40,13 @@ public class RecipeController {
     public String newRecipe(Model model) {
         model.addAttribute("recipe", new RecipeCommand());
         return "/recipes/recipe_form";
+    }
+
+    @GetMapping("/recipes/{id}/delete")
+    public String deleteById(@PathVariable Long id) {
+        log.debug("Deleting recipe: " + id);
+        recipeService.deleteById(id);
+        return "redirect:/recipes";
     }
 
     @PostMapping("recipes")

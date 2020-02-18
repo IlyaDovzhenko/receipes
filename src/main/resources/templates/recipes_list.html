@@ -39,6 +39,7 @@
                                         <th scope="col">Notes</th>
                                         <th scope="col">Link</th>
                                         <th scope="col">Update</th>
+                                        <th scope="col">Delete</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,6 +51,7 @@
                                         <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
                                         <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/show'}">View</a></td>
                                         <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/update'}">Update</a></td>
+                                        <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/delete'}">Delete</a></td>
                                     </tr>
                                 </tbody>
                             </table>

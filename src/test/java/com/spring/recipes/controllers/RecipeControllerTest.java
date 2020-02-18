@@ -128,4 +128,12 @@ class RecipeControllerTest {
                 .andExpect(MockMvcResultMatchers.view().name("/recipes/recipe_form"))
                 .andExpect(model().attributeExists("recipe"));
     }
+
+    @Test
+    void testDelete() throws Exception {
+        mockMvc.perform(get("/recipes/1/delete"))
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name("redirect:/recipes"));
+        verify(recipeService, times(1)).deleteById(anyLong());
+    }
 }

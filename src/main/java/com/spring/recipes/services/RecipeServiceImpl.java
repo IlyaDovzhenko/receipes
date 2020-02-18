@@ -63,4 +63,9 @@ public class RecipeServiceImpl implements RecipeService {
             throw new RuntimeException("Problem with convert recipe!");
         }
     }
+
+    @Override
+    public void deleteById(Long id) {
+        recipeRepository.deleteById(id);
+    }
 }

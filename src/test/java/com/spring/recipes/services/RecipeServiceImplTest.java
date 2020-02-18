@@ -121,4 +121,15 @@ class RecipeServiceImplTest {
         verify(recipeToRecipeCommand, times(1)).convert(any());
         verify(recipeRepository, times(1)).findById(any());
     }
+
+    @Test
+    void testDeleteById() {
+        // given
+
+        //when
+        recipeService.deleteById(RECIPE_ID);
+
+        //then
+        verify(recipeRepository, times(1)).deleteById(any());
+    }
 }
