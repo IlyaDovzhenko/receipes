@@ -108,4 +108,17 @@ class RecipeServiceImplTest {
                 () -> recipeService.saveRecipeCommand(recipeCommand));
         assertEquals(SAVE_EXCEPTION_MESSAGE, exception.getMessage());
     }
+
+    @Test
+    void testFindCommandById() {
+        when(recipeRepository.findById(any())).thenReturn(Optional.of(returnedRecipe));
+        when(recipeToRecipeCommand.convert(any())).thenReturn(recipeCommand);
+
+        RecipeCommand newRecipeCommand = recipeService.findCommandById(1L);
+        assertNotNull(newRecipeCommand);
+        assertEquals(RECIPE_ID, newRecipeCommand.getId());
+        assertEquals(RECIPE_DESCRIPTION, newRecipeCommand.getDescription());
+        verify(recipeToRecipeCommand, times(1)).convert(any());
+        verify(recipeRepository, times(1)).findById(any());
+    }
 }
