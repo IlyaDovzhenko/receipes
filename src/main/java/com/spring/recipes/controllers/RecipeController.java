@@ -14,7 +14,7 @@ public class RecipeController {
     private RecipeService recipeService;
 
     public RecipeController(RecipeService recipeService) {
-        log.debug(RecipeController.class.getName() + " run!");
+        log.debug(RecipeController.class.getName() + " initialized!");
         this.recipeService = recipeService;
     }
 
