@@ -38,6 +38,7 @@
                                         <th scope="col">Cook time</th>
                                         <th scope="col">Notes</th>
                                         <th scope="col">Link</th>
+                                        <th scope="col">Update</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -48,6 +49,7 @@
                                         <td th:text="${recipe.getCookTime()}"></td>
                                         <td th:text="${recipe.getNotes().getRecipeNotes()}"></td>
                                         <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/show'}">View</a></td>
+                                        <td><a href="#" th:href="@{'/recipes/' + ${recipe.getId()} + '/update'}">Update</a></td>
                                     </tr>
                                 </tbody>
                             </table>
