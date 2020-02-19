@@ -78,12 +78,13 @@ class RecipeServiceImplTest {
 
     @Test
     void findByIdExceptionTest() {
+        String exMessage = "Recipe with id:" + RECIPE_ID + " Not Found!";
         when(recipeRepository.findById(RECIPE_ID)).thenReturn(Optional.empty());
         RuntimeException exception = assertThrows(
                 RuntimeException.class,
                 () -> recipeService.findById(RECIPE_ID));
 
-        assertEquals(FIND_BY_ID_EXCEPTION_MESSAGE, exception.getMessage());
+        assertEquals(exMessage, exception.getMessage());
         verify(recipeRepository, times(1)).findById(RECIPE_ID);
     }
 

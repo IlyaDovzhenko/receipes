@@ -1,0 +1,154 @@
+package com.spring.recipes.services;
+
+import com.spring.recipes.command.IngredientCommand;
+import com.spring.recipes.converters.IngredientCommandToIngredient;
+import com.spring.recipes.converters.IngredientToIngredientCommand;
+import com.spring.recipes.domain.Ingredient;
+import com.spring.recipes.repositories.IngredientRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
+
+@Slf4j
+@ExtendWith(MockitoExtension.class)
+class IngredientServiceImplTest {
+
+    @Mock
+    private IngredientRepository ingredientRepository;
+    @Mock
+    private IngredientToIngredientCommand ingredientToCommand;
+    @Mock
+    private IngredientCommandToIngredient commandToIngredient;
+
+    @InjectMocks
+    private IngredientServiceImpl ingredientService;
+
+    private Ingredient returnedIngredient;
+    private IngredientCommand returnedIngredientCommand;
+    private final Long INGREDIENT_ID = 1L;
+    private final String INGREDIENT_DESCRIPTION = "ingredient";
+
+    @BeforeEach
+    void setUp() {
+        returnedIngredient = new Ingredient();
+        returnedIngredient.setId(INGREDIENT_ID);
+        returnedIngredient.setDescription(INGREDIENT_DESCRIPTION);
+
+        returnedIngredientCommand = new IngredientCommand();
+        returnedIngredientCommand.setId(INGREDIENT_ID);
+        returnedIngredientCommand.setDescription(INGREDIENT_DESCRIPTION);
+    }
+
+    @Test
+    void getIngredientsTest() {
+        //given
+        Set<Ingredient> returnedIngredients = new HashSet<>();
+        returnedIngredients.add(returnedIngredient);
+
+        //when
+        when(ingredientRepository.findAll()).thenReturn(returnedIngredients);
+        Set<Ingredient> ingredients = ingredientService.getIngredients();
+
+        //then
+        assertNotNull(ingredients);
+        assertEquals(1, ingredients.size());
+        verify(ingredientRepository, times(1)).findAll();
+    }
+
+    @Test
+    void findByIdTest() {
+        //when
+        when(ingredientRepository.findById(anyLong())).thenReturn(Optional.of(returnedIngredient));
+        Ingredient ingredient = ingredientService.findById(INGREDIENT_ID);
+
+        //then
+        assertNotNull(ingredient);
+        assertEquals(INGREDIENT_ID, ingredient.getId());
+        assertEquals(INGREDIENT_DESCRIPTION, ingredient.getDescription());
+        verify(ingredientRepository, times(1)).findById(anyLong());
+    }
+
+    @Test
+    void findByIdExceptionTest() {
+        //given
+        String exMessage = "Ingredient with id:" + INGREDIENT_ID + " not found!";
+
+        //when
+        when(ingredientRepository.findById(INGREDIENT_ID)).thenReturn(Optional.empty());
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> ingredientService.findById(INGREDIENT_ID));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage, exception.getMessage());
+        verify(ingredientRepository, times(1)).findById(INGREDIENT_ID);
+    }
+
+    @Test
+    void findCommandByIdTest() {
+        //when
+        when(ingredientRepository.findById(INGREDIENT_ID)).thenReturn(Optional.of(returnedIngredient));
+        when(ingredientToCommand.convert(any())).thenReturn(returnedIngredientCommand);
+        IngredientCommand ingredientCommand = ingredientService.findCommandById(INGREDIENT_ID);
+
+        //then
+        assertNotNull(ingredientCommand);
+        assertEquals(INGREDIENT_ID, ingredientCommand.getId());
+        assertEquals(INGREDIENT_DESCRIPTION, ingredientCommand.getDescription());
+        verify(ingredientRepository, times(1)).findById(INGREDIENT_ID);
+        verify(ingredientToCommand, times(1)).convert(any());
+    }
+
+    @Test
+    void saveIngredientCommandTest() {
+        //when
+        when(commandToIngredient.convert(any())).thenReturn(returnedIngredient);
+        when(ingredientToCommand.convert(any())).thenReturn(returnedIngredientCommand);
+        IngredientCommand commandToSave = ingredientService.saveIngredientCommand(returnedIngredientCommand);
+
+        //then
+        assertNotNull(commandToSave);
+        assertEquals(INGREDIENT_ID, commandToSave.getId());
+        assertEquals(INGREDIENT_DESCRIPTION, commandToSave.getDescription());
+        verify(ingredientRepository, times(1)).save(returnedIngredient);
+        verify(ingredientToCommand, times(1)).convert(any());
+        verify(commandToIngredient, times(1)).convert(any());
+    }
+
+    @Test
+    void saveIngredientCommandExceptionTest() {
+        //given
+        String exMessage = "No ingredient to save!";
+
+        //when
+        when(commandToIngredient.convert(returnedIngredientCommand)).thenReturn(null);
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> ingredientService.saveIngredientCommand(returnedIngredientCommand));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage, exception.getMessage());
+    }
+
+    @Test
+    void deleteById() {
+        //when
+        ingredientService.deleteById(INGREDIENT_ID);
+
+        //then
+        verify(ingredientRepository, times(1)).deleteById(any());
+    }
+}
