@@ -56,7 +56,7 @@ class IngredientToIngredientCommandTest {
     }
 
     @Test
-    void convert() {
+    void convertTest() {
         //given
         when(uomConverter.convert(uom)).thenReturn(uomCommand);
 
