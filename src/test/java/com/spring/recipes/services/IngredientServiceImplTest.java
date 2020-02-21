@@ -4,6 +4,7 @@ import com.spring.recipes.command.IngredientCommand;
 import com.spring.recipes.converters.IngredientCommandToIngredient;
 import com.spring.recipes.converters.IngredientToIngredientCommand;
 import com.spring.recipes.domain.Ingredient;
+import com.spring.recipes.domain.Recipe;
 import com.spring.recipes.repositories.IngredientRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,6 +27,8 @@ class IngredientServiceImplTest {
 
     @Mock
     private IngredientRepository ingredientRepository;
+    @Mock
+    private RecipeService recipeService;
     @Mock
     private IngredientToIngredientCommand ingredientToCommand;
     @Mock
@@ -150,5 +153,66 @@ class IngredientServiceImplTest {
 
         //then
         verify(ingredientRepository, times(1)).deleteById(any());
+    }
+
+    @Test
+    void findByRecipeIdAndIngredientIdTest() {
+        //given
+        Recipe recipe = new Recipe();
+        recipe.setId(3L);
+        recipe.setDescription("recipe_3L");
+        recipe.addIngredient(returnedIngredient);
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(recipe);
+        when(ingredientToCommand.convert(any())).thenReturn(returnedIngredientCommand);
+        IngredientCommand ingredientCommand =
+                ingredientService.findByRecipeIdAndIngredientId(3L, 1L);
+
+        //then
+        assertNotNull(ingredientCommand);
+        assertEquals(INGREDIENT_ID, ingredientCommand.getId());
+        assertEquals(INGREDIENT_DESCRIPTION, ingredientCommand.getDescription());
+        verify(recipeService, times(1)).findById(anyLong());
+        verify(ingredientToCommand, times(1)).convert(any());
+    }
+
+    @Test
+    void findByRecipeIdAndIngredientIdRecipeExceptionTest() {
+        //given
+        String exMessage = "Can't find recipe with id:";
+        Long recipeId = 1L;
+        Long ingredientId = 1L;
+
+        //when
+        when(recipeService.findById(any())).thenReturn(null);
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage + recipeId, exception.getMessage());
+    }
+
+    @Test
+    void findByRecipeIdAndIngredientIdIngredientExceptionTest() {
+        //given
+        String exMessage = "Can't find ingredient with id:";
+        Long recipeId = 1L;
+        Long ingredientId = 1L;
+        Recipe recipe = new Recipe();
+        recipe.setId(recipeId);
+        recipe.setDescription("recipe_3L");
+
+        //when
+        when(recipeService.findById(recipeId)).thenReturn(recipe);
+        RuntimeException exception = assertThrows(
+                RuntimeException.class,
+                () -> ingredientService.findByRecipeIdAndIngredientId(recipeId, ingredientId));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage + ingredientId, exception.getMessage());
     }
 }

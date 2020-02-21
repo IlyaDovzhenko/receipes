@@ -73,7 +73,7 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public void deleteById(Long id) {
         ingredientRepository.deleteById(id);
-        log.debug("Ingredient with id:" + id + "deleted!");
+        log.debug("Ingredient with id:" + id + " deleted!");
     }
 
     @Override
