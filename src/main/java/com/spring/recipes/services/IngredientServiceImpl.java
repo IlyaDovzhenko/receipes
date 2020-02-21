@@ -6,7 +6,10 @@ import com.spring.recipes.converters.IngredientCommandToIngredient;
 import com.spring.recipes.converters.IngredientToIngredientCommand;
 import com.spring.recipes.domain.Ingredient;
 import com.spring.recipes.domain.Recipe;
+import com.spring.recipes.domain.UnitOfMeasure;
 import com.spring.recipes.repositories.IngredientRepository;
+import com.spring.recipes.repositories.RecipeRepository;
+import com.spring.recipes.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,16 +23,22 @@ import java.util.Set;
 public class IngredientServiceImpl implements IngredientService {
 
     private IngredientRepository ingredientRepository;
+    private UnitOfMeasureRepository uomRepository;
     private RecipeService recipeService;
+    private RecipeRepository recipeRepository;
     private IngredientToIngredientCommand ingredientToCommand;
     private IngredientCommandToIngredient commandToIngredient;
 
     public IngredientServiceImpl(IngredientRepository ingredientRepository,
+                                 UnitOfMeasureRepository uomRepository,
                                  RecipeService recipeService,
+                                 RecipeRepository recipeRepository,
                                  IngredientToIngredientCommand ingredientToCommand,
                                  IngredientCommandToIngredient commandToIngredient) {
         this.ingredientRepository = ingredientRepository;
+        this.uomRepository = uomRepository;
         this.recipeService = recipeService;
+        this.recipeRepository = recipeRepository;
         this.ingredientToCommand = ingredientToCommand;
         this.commandToIngredient = commandToIngredient;
         log.debug("Service initialized! Dependencies are injected!");
@@ -60,14 +69,35 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     @Transactional
     public IngredientCommand saveIngredientCommand(IngredientCommand ingredientCommand) {
-        Ingredient ingredientToSave = commandToIngredient.convert(ingredientCommand);
-        if (ingredientToSave != null) {
-            ingredientRepository.save(ingredientToSave);
-            log.debug("Saved ingredient with id:" + ingredientToSave.getId());
-            return ingredientToCommand.convert(ingredientToSave);
+        Recipe recipe = recipeService.findById(ingredientCommand.getRecipeId());
+
+        Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
+                .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
+                .findFirst();
+        if (ingredientOptional.isPresent()) {
+            Ingredient ingredient = ingredientOptional.get();
+            ingredient.setDescription(ingredientCommand.getDescription());
+            ingredient.setAmount(ingredientCommand.getAmount());
+            UnitOfMeasure unitOfMeasure = uomRepository.findById(ingredientCommand.getUnitOfMeasure().getId())
+                    .orElseThrow(() -> new RuntimeException("Unit of Measure not found!"));
+            ingredient.setUnitOfMeasure(unitOfMeasure);
         } else {
-            throw new RuntimeException("No ingredient to save!");
+            Ingredient ingredientToSave = commandToIngredient.convert(ingredientCommand);
+            if (ingredientToSave != null) {
+                recipe.addIngredient(ingredientToSave);
+            } else {
+                throw new RuntimeException("No ingredient to save!");
+            }
         }
+        Recipe savedRecipe = recipeRepository.save(recipe);
+
+        Optional<Ingredient> savedIngredient = savedRecipe.getIngredients().stream()
+                .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
+                .findFirst();
+        if (!savedIngredient.isPresent()) {
+            throw new RuntimeException("Ingredient not saved!");
+        }
+        return ingredientToCommand.convert(savedIngredient.get());
     }
 
     @Override
