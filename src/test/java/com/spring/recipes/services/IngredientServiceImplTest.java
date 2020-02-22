@@ -1,11 +1,15 @@
 package com.spring.recipes.services;
 
 import com.spring.recipes.command.IngredientCommand;
+import com.spring.recipes.command.UnitOfMeasureCommand;
 import com.spring.recipes.converters.IngredientCommandToIngredient;
 import com.spring.recipes.converters.IngredientToIngredientCommand;
 import com.spring.recipes.domain.Ingredient;
 import com.spring.recipes.domain.Recipe;
+import com.spring.recipes.domain.UnitOfMeasure;
 import com.spring.recipes.repositories.IngredientRepository;
+import com.spring.recipes.repositories.RecipeRepository;
+import com.spring.recipes.repositories.UnitOfMeasureRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +34,10 @@ class IngredientServiceImplTest {
     @Mock
     private RecipeService recipeService;
     @Mock
+    private RecipeRepository recipeRepository;
+    @Mock
+    private UnitOfMeasureRepository uomRepository;
+    @Mock
     private IngredientToIngredientCommand ingredientToCommand;
     @Mock
     private IngredientCommandToIngredient commandToIngredient;
@@ -41,6 +49,9 @@ class IngredientServiceImplTest {
     private IngredientCommand returnedIngredientCommand;
     private final Long INGREDIENT_ID = 1L;
     private final String INGREDIENT_DESCRIPTION = "ingredient";
+    private Recipe returnedRecipe;
+    private UnitOfMeasureCommand returnedUomCommand;
+    private UnitOfMeasure returnedUom;
 
     @BeforeEach
     void setUp() {
@@ -51,6 +62,18 @@ class IngredientServiceImplTest {
         returnedIngredientCommand = new IngredientCommand();
         returnedIngredientCommand.setId(INGREDIENT_ID);
         returnedIngredientCommand.setDescription(INGREDIENT_DESCRIPTION);
+
+        returnedRecipe = new Recipe();
+        returnedRecipe.setId(1L);
+        returnedRecipe.setDescription("testRecipe");
+
+        returnedUomCommand = new UnitOfMeasureCommand();
+        returnedUomCommand.setId(1L);
+        returnedUomCommand.setDescription("uom");
+
+        returnedUom = new UnitOfMeasure();
+        returnedUom.setId(1L);
+        returnedUom.setDescription("uom");
     }
 
     @Test
@@ -116,29 +139,102 @@ class IngredientServiceImplTest {
 
     @Test
     void saveIngredientCommandTest() {
+        //given
+        returnedIngredientCommand.setRecipeId(1L);
+        returnedIngredientCommand.setUnitOfMeasure(returnedUomCommand);
+
+        returnedRecipe.getIngredients().add(returnedIngredient);
+
         //when
-        when(commandToIngredient.convert(any())).thenReturn(returnedIngredient);
+        when(recipeService.findById(anyLong())).thenReturn(returnedRecipe);
+        when(uomRepository.findById(anyLong())).thenReturn(Optional.of(returnedUom));
+        when(recipeRepository.save(any())).thenReturn(returnedRecipe);
         when(ingredientToCommand.convert(any())).thenReturn(returnedIngredientCommand);
-        IngredientCommand commandToSave = ingredientService.saveIngredientCommand(returnedIngredientCommand);
+
+        IngredientCommand savedIngredientCommand = ingredientService.saveIngredientCommand(returnedIngredientCommand);
 
         //then
-        assertNotNull(commandToSave);
-        assertEquals(INGREDIENT_ID, commandToSave.getId());
-        assertEquals(INGREDIENT_DESCRIPTION, commandToSave.getDescription());
-        verify(ingredientRepository, times(1)).save(returnedIngredient);
+        assertNotNull(savedIngredientCommand);
+        assertEquals(INGREDIENT_ID, savedIngredientCommand.getId());
+        assertEquals(INGREDIENT_DESCRIPTION, savedIngredientCommand.getDescription());
+        assertEquals(returnedUom.getId(), savedIngredientCommand.getUnitOfMeasure().getId());
+        assertEquals(returnedUom.getDescription(), savedIngredientCommand.getUnitOfMeasure().getDescription());
+        verify(recipeRepository, times(1)).save(any());
+        verify(recipeService, times(1)).findById(anyLong());
+        verify(uomRepository, times(1)).findById(anyLong());
         verify(ingredientToCommand, times(1)).convert(any());
-        verify(commandToIngredient, times(1)).convert(any());
     }
 
     @Test
-    void saveIngredientCommandExceptionTest() {
+    void saveIngredientCommandNotExistsUomExceptionTest() {
         //given
-        String exMessage = "No ingredient to save!";
+        String exMessage = "Unit of Measure not found!";
+        returnedIngredientCommand.setRecipeId(1L);
+        returnedIngredientCommand.setUnitOfMeasure(returnedUomCommand);
+
+        returnedRecipe.getIngredients().add(returnedIngredient);
 
         //when
-        when(commandToIngredient.convert(returnedIngredientCommand)).thenReturn(null);
+        when(recipeService.findById(anyLong())).thenReturn(returnedRecipe);
+        when(uomRepository.findById(anyLong())).thenReturn(Optional.empty());
         RuntimeException exception = assertThrows(
                 RuntimeException.class,
+                () -> ingredientService.saveIngredientCommand(returnedIngredientCommand));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage, exception.getMessage());
+    }
+
+    @Test
+    void saveIngredientCommandEmptyIngredient() {
+        //given
+        String exMessage = "No ingredient to save!";
+        returnedIngredientCommand.setRecipeId(1L);
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(returnedRecipe);
+        when(commandToIngredient.convert(any())).thenReturn(null);
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> ingredientService.saveIngredientCommand(returnedIngredientCommand));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage, exception.getMessage());
+    }
+
+    @Test
+    void saveIngredientCommandNotEmptyIngredient() {
+        //given
+        String exMessage = "No ingredient to save!";
+        returnedIngredientCommand.setRecipeId(1L);
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(returnedRecipe);
+        when(commandToIngredient.convert(any())).thenReturn(returnedIngredient);
+        when(recipeRepository.save(any())).thenReturn(returnedRecipe);
+        when(ingredientToCommand.convert(any())).thenReturn(returnedIngredientCommand);
+        IngredientCommand savedIngredientCommand = ingredientService.saveIngredientCommand(returnedIngredientCommand);
+
+        //then
+        assertNotNull(savedIngredientCommand);
+    }
+
+    @Test
+    void saveIngredientCommandNotSaveIngredientToRecipe() {
+        //given
+        String exMessage = "Ingredient not saved!";
+        returnedIngredientCommand.setRecipeId(1L);
+
+        Recipe recipeWithoutIngredient = new Recipe();
+        recipeWithoutIngredient.setId(2L);
+        recipeWithoutIngredient.setDescription("recipeWithoutIngredient");
+
+        //when
+        when(recipeService.findById(anyLong())).thenReturn(returnedRecipe);
+        when(commandToIngredient.convert(any())).thenReturn(returnedIngredient);
+        when(recipeRepository.save(any())).thenReturn(recipeWithoutIngredient);
+        RuntimeException exception = assertThrows(RuntimeException.class,
                 () -> ingredientService.saveIngredientCommand(returnedIngredientCommand));
 
         //then
