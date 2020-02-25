@@ -1,6 +1,8 @@
 package com.spring.recipes.controllers;
 
 import com.spring.recipes.command.IngredientCommand;
+import com.spring.recipes.command.RecipeCommand;
+import com.spring.recipes.command.UnitOfMeasureCommand;
 import com.spring.recipes.services.IngredientService;
 import com.spring.recipes.services.RecipeService;
 import com.spring.recipes.services.UnitOfMeasureService;
@@ -59,6 +61,24 @@ public class IngredientController {
         ingredientService.deleteById(ingredientId);
         log.debug("Deleting ingredient with id:" + ingredientId);
         return "redirect:/recipes/" + recipeId + "/ingredients";
+    }
+
+    @GetMapping("recipes/{recipeId}/ingredients/new")
+    public String createIngredient(@PathVariable Long recipeId, Model model) {
+        RecipeCommand savedRecipeCommand = recipeService.findCommandById(recipeId);
+        if (savedRecipeCommand == null) {
+            throw new RuntimeException("This recipe does not exist! id:" + recipeId);
+        }
+
+        IngredientCommand ingredientCommand = new IngredientCommand();
+        ingredientCommand.setRecipeId(recipeId);
+        savedRecipeCommand.getIngredients().add(ingredientCommand);
+        model.addAttribute("ingredient", ingredientCommand);
+
+        ingredientCommand.setUnitOfMeasure(new UnitOfMeasureCommand());
+        model.addAttribute("uomList", uomService.getAll());
+
+        return "/recipes/ingredient/ingredient_form";
     }
 
     @PostMapping("/recipes/{recipeId}/ingredients")

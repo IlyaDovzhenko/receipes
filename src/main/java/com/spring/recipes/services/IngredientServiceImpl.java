@@ -85,6 +85,7 @@ public class IngredientServiceImpl implements IngredientService {
             Ingredient ingredientToSave = commandToIngredient.convert(ingredientCommand);
             if (ingredientToSave != null) {
                 recipe.addIngredient(ingredientToSave);
+                ingredientToSave.setRecipe(recipe);
             } else {
                 throw new RuntimeException("No ingredient to save!");
             }
