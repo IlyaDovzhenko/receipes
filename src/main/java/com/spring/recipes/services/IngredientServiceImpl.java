@@ -96,7 +96,17 @@ public class IngredientServiceImpl implements IngredientService {
                 .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
                 .findFirst();
         if (!savedIngredient.isPresent()) {
-            throw new RuntimeException("Ingredient not saved!");
+            savedIngredient = savedRecipe.getIngredients().stream()
+                    .filter(recipeIngredient ->
+                            recipeIngredient.getDescription()
+                                    .equals(ingredientCommand.getDescription()))
+                    .filter(recipeIngredient ->
+                            recipeIngredient.getAmount()
+                                    .equals(ingredientCommand.getAmount()))
+                    .filter(recipeIngredient ->
+                            recipeIngredient.getUnitOfMeasure().getId()
+                                    .equals(ingredientCommand.getUnitOfMeasure().getId()))
+                    .findFirst();
         }
         return ingredientToCommand.convert(savedIngredient.get());
     }
