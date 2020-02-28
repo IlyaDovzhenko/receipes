@@ -108,6 +108,9 @@ public class IngredientServiceImpl implements IngredientService {
                                     .equals(ingredientCommand.getUnitOfMeasure().getId()))
                     .findFirst();
         }
+        if (!savedIngredient.isPresent()) {
+            throw new RuntimeException("Ingredient not saved!");
+        }
         return ingredientToCommand.convert(savedIngredient.get());
     }
 

@@ -14,16 +14,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
 import java.util.HashSet;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -133,7 +137,49 @@ class IngredientControllerTest {
     }
 
     @Test
-    void saveOrUpdate() {
+    void saveOrUpdatePostTest() throws Exception {
+        //given
+        RequestBuilder postRequestBuilder = post("/recipes/" + 1L + "/ingredients")
+                .contentType(MediaType.APPLICATION_FORM_URLENCODED);
 
+        //when
+        when(ingredientService.saveIngredientCommand(any())).thenReturn(returnedIngredientCommand);
+
+        //then
+        mockMvc.perform(postRequestBuilder)
+                .andExpect(status().is3xxRedirection())
+                .andExpect(view().name(
+                        "redirect:/recipes/" + RECIPE_ID + "/ingredients/" + INGREDIENT_ID + "/show"));
+    }
+
+    @Test
+    void createIngredientGetTest() throws Exception{
+        //given
+        Set<UnitOfMeasure> uomList = new HashSet<>();
+        uomList.add(new UnitOfMeasure());
+
+        //when
+        when(recipeService.findCommandById(anyLong())).thenReturn(returnedRecipeCommand);
+        when(uomService.getAll()).thenReturn(uomList);
+
+        //then
+        mockMvc.perform(get("/recipes/" + RECIPE_ID + "/ingredients/new"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("/recipes/ingredient/ingredient_form"))
+                .andExpect(model().attributeExists("ingredient", "uomList"));
+    }
+
+    @Test
+    void createIngredientExceptionTest() {
+        //given
+        String exMessage = "This recipe does not exist! id:" + RECIPE_ID;
+
+        //when
+        RuntimeException exception = assertThrows(RuntimeException.class,
+                () -> ingredientController.createIngredient(RECIPE_ID, any()));
+
+        //then
+        assertNotNull(exception);
+        assertEquals(exMessage, exception.getMessage());
     }
 }
